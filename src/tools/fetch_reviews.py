@@ -57,7 +57,7 @@ def get_reviews_from_play_store(app_id: str, max_reviews: int, window_weeks: int
     return filtered_reviews
 
 @tool
-def fetch_reviews(app_id: str, weeks: int) -> List[Dict[str, Any]]:
+def fetch_reviews(app_id: str, weeks: int) -> str:
     """
     Fetch recent Google Play Store reviews for the given app ID.
     
@@ -66,7 +66,7 @@ def fetch_reviews(app_id: str, weeks: int) -> List[Dict[str, Any]]:
         weeks: The number of weeks of reviews to fetch (e.g., 12).
         
     Returns:
-        A list of raw review dictionaries.
+        A string message indicating success and where the file is saved.
     """
     logger.info(f"📥 Fetching reviews for {app_id} over the last {weeks} weeks...")
     config = load_config()
@@ -74,4 +74,11 @@ def fetch_reviews(app_id: str, weeks: int) -> List[Dict[str, Any]]:
     
     fetched = get_reviews_from_play_store(app_id, max_reviews, weeks)
     logger.info(f"✅ Successfully fetched {len(fetched)} reviews.")
-    return fetched
+    
+    import json
+    import os
+    os.makedirs("data", exist_ok=True)
+    with open("data/raw_fetched.json", "w") as f:
+        json.dump(fetched, f)
+        
+    return f"Successfully fetched {len(fetched)} reviews and saved to data/raw_fetched.json."

@@ -76,18 +76,24 @@ def save_reviews(new_reviews: List[Dict[str, Any]], filepath: str = "data/review
                 writer.writerow(r)
 
 @tool
-def scrub_pii(raw_reviews: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+def scrub_pii(status_message: str) -> str:
     """
     Scrub Personally Identifiable Information (PII) from a list of reviews.
-    Removes fields like userName and userImage, and redacts emails and phone numbers in the text.
-    Also saves the cleaned reviews to local storage (data/reviews.json).
+    Reads from data/raw_fetched.json and saves to data/reviews.json.
     
     Args:
-        raw_reviews: List of raw review dictionaries.
+        status_message: A message from the previous step indicating completion.
         
     Returns:
-        List of cleaned review dictionaries.
+        A string message indicating success.
     """
+    import os
+    if not os.path.exists("data/raw_fetched.json"):
+        return "Error: data/raw_fetched.json not found."
+        
+    with open("data/raw_fetched.json", "r") as f:
+        raw_reviews = json.load(f)
+        
     clean_reviews = []
     
     for r in raw_reviews:
@@ -110,4 +116,4 @@ def scrub_pii(raw_reviews: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     # Save to data/reviews.json
     save_reviews(clean_reviews)
     
-    return clean_reviews
+    return f"Successfully scrubbed {len(clean_reviews)} reviews and saved to data/reviews.json."

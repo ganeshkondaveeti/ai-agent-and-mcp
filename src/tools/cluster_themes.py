@@ -73,14 +73,25 @@ def merge_smallest_themes(themes: List[ThemeRaw], max_themes: int) -> List[Theme
     return sorted_themes
 
 @tool
-def cluster_themes(reviews: List[Dict[str, Any]]) -> Dict[str, Any]:
+def cluster_themes(status_message: str) -> str:
     """
     Cluster app reviews into themes using Groq.
-    Expects a list of dictionaries with at least 'reviewId', 'content', 'score', and 'thumbsUpCount'.
-    Returns a dictionary of themes with computed metrics.
+    Reads from data/reviews.json and saves output to data/themes.json.
+    
+    Args:
+        status_message: A message from the previous step indicating completion.
+        
+    Returns:
+        A string message indicating success.
     """
+    if not os.path.exists("data/reviews.json"):
+        return "Error: data/reviews.json not found."
+        
+    with open("data/reviews.json", "r") as f:
+        reviews = json.load(f)
+        
     if not reviews:
-        return {"themes": []}
+        return "No reviews to cluster."
         
     config = load_config()
     max_themes = config.get("clustering", {}).get("max_themes", 5)
@@ -235,4 +246,4 @@ def cluster_themes(reviews: List[Dict[str, Any]]) -> Dict[str, Any]:
     with open("data/themes.json", "w") as f:
         json.dump(result_dict, f, indent=2)
         
-    return result_dict
+    return f"Successfully clustered into {len(final_themes)} themes and saved to data/themes.json."

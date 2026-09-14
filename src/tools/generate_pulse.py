@@ -16,12 +16,21 @@ def format_pulse(pulse_markdown: str, max_words: int) -> str:
     return truncated + "\n\n*(Truncated to meet length limit)*"
 
 @tool
-def generate_pulse(themes_result: Dict[str, Any]) -> str:
+def generate_pulse(status_message: str) -> str:
     """
     Generates a weekly markdown pulse note based on clustered themes.
-    Expects a dictionary with a 'themes' key containing the clustered themes.
+    Reads from data/themes.json.
     Returns the generated markdown content.
+    
+    Args:
+        status_message: A message from the previous step indicating completion.
     """
+    if not os.path.exists("data/themes.json"):
+        return "Error: data/themes.json not found."
+        
+    with open("data/themes.json", "r") as f:
+        themes_result = json.load(f)
+        
     themes = themes_result.get("themes", [])
     if not themes:
         return "# No insights this week\nThere were no valid themes to generate a pulse from."
@@ -81,4 +90,9 @@ def generate_pulse(themes_result: Dict[str, Any]) -> str:
     content = content.strip()
     
     final_pulse = format_pulse(content, max_words)
+    
+    # Save the pulse to disk for completeness
+    with open("data/pulse.md", "w") as f:
+        f.write(final_pulse)
+        
     return final_pulse

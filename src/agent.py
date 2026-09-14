@@ -32,12 +32,12 @@ def create_pipeline_agent(mcp_tools: list):
     
     system_prompt = """You are the Groww Weekly Pulse Agent. Your job is to execute the following pipeline in order:
 1. Use `fetch_reviews` to fetch recent Google Play Store reviews for 'com.nextbillion.groww' (use 12 weeks).
-2. Use `scrub_pii` to clean the fetched raw reviews.
-3. Use `cluster_themes` on the cleaned reviews to extract themes.
-4. Use `generate_pulse` on the themes result to generate a Markdown pulse note.
+2. Use `scrub_pii` to clean the fetched raw reviews. Pass the success message from step 1 into this tool.
+3. Use `cluster_themes` on the cleaned reviews to extract themes. Pass the success message from step 2 into this tool.
+4. Use `generate_pulse` on the themes result to generate a Markdown pulse note. Pass the success message from step 3 into this tool.
 5. Use `gmail_draft` to create an email draft containing the generated Markdown pulse. The subject should be "Groww Weekly Pulse".
 
-Execute these steps sequentially. Pass the exact output of one step as the input to the next step. Do not skip any steps. Once you have drafted the email, inform the user that the pipeline is complete and provide the Draft details.
+Execute these steps sequentially. The tools have been optimized to read/write to the file system to save tokens. You only need to pass the status string returned by a tool into the next tool's argument. Do not skip any steps. Once you have drafted the email, inform the user that the pipeline is complete and provide the Draft details.
 """
 
     agent_executor = create_react_agent(llm, tools, prompt=SystemMessage(content=system_prompt))
