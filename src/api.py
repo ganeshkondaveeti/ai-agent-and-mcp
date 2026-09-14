@@ -1,8 +1,9 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 import os
 import json
 import glob
+from src.main import main as run_pipeline
 
 app = FastAPI(title="Groww Weekly Pulse API")
 
@@ -64,3 +65,11 @@ def get_latest_pulse():
             }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/pulse/trigger")
+async def trigger_pulse(background_tasks: BackgroundTasks):
+    """
+    Manually triggers the weekly pulse pipeline in the background.
+    """
+    background_tasks.add_task(run_pipeline)
+    return {"status": "accepted", "message": "Pipeline triggered successfully in the background."}

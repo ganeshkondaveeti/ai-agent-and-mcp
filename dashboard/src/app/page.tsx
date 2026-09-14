@@ -32,9 +32,27 @@ export default function Dashboard() {
   const [themes, setThemes] = useState<Theme[]>([]);
   const [pulse, setPulse] = useState<Pulse | null>(null);
   const [loading, setLoading] = useState(true);
+  const [triggering, setTriggering] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
+
+  const triggerPipeline = async () => {
+    setTriggering(true);
+    try {
+      const res = await fetch(`${API_URL}/pulse/trigger`, { method: "POST" });
+      if (res.ok) {
+        alert("Pipeline triggered! Check back in a few minutes for the updated pulse.");
+      } else {
+        alert("Failed to trigger pipeline.");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Error triggering pipeline.");
+    } finally {
+      setTriggering(false);
+    }
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -78,20 +96,39 @@ export default function Dashboard() {
             </div>
           </div>
           
-          <nav className="flex space-x-2">
-            {["pulse", "themes", "reviews"].map((tab) => (
-              <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
-                  activeTab === tab
-                    ? "bg-primary text-background"
-                    : "text-text-secondary hover:text-text-primary hover:bg-surface-floating"
-                }`}
-              >
-                {tab.charAt(0).toUpperCase() + tab.slice(1)}
-              </button>
-            ))}
+          <nav className="flex items-center space-x-4">
+            <div className="flex space-x-2">
+              {["pulse", "themes", "reviews"].map((tab) => (
+                <button
+                  key={tab}
+                  onClick={() => setActiveTab(tab)}
+                  className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
+                    activeTab === tab
+                      ? "bg-primary text-background"
+                      : "text-text-secondary hover:text-text-primary hover:bg-surface-floating"
+                  }`}
+                >
+                  {tab.charAt(0).toUpperCase() + tab.slice(1)}
+                </button>
+              ))}
+            </div>
+            <div className="w-px h-6 bg-border"></div>
+            <button 
+              onClick={triggerPipeline} 
+              disabled={triggering}
+              className="px-4 py-1.5 bg-ai/10 text-ai border border-ai/20 hover:bg-ai/20 disabled:opacity-50 rounded-lg text-sm font-semibold transition-all flex items-center gap-2"
+            >
+              {triggering ? (
+                <>
+                  <div className="w-3 h-3 border-2 border-ai border-t-transparent rounded-full animate-spin"></div>
+                  Triggering...
+                </>
+              ) : (
+                <>
+                  ⚡ Trigger Now
+                </>
+              )}
+            </button>
           </nav>
         </div>
       </header>
