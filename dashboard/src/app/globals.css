@@ -2,10 +2,10 @@
 @plugin "@tailwindcss/typography";
 
 @theme inline {
-  --color-background: #0B0F14;
-  --color-foreground: #E6EDF3;
+  --color-background: #0A0A0A;
+  --color-foreground: #FAFAFA;
   
-  /* Brand Colors from DESIGN.md */
+  /* Brand Colors */
   --color-primary: #00D09C;
   --color-primary-hover: #00B887;
   --color-ai: #7C6BFF;
@@ -13,25 +13,18 @@
   --color-danger: #FF5C5C;
   
   /* Surfaces & Borders */
-  --color-surface: #12181F;
-  --color-surface-floating: #18202A;
-  --color-border: #1E2630;
-  --color-border-hover: #2C3847;
+  --color-surface: rgba(20, 20, 20, 0.6);
+  --color-surface-floating: rgba(30, 30, 30, 0.7);
+  --color-border: rgba(255, 255, 255, 0.08);
+  --color-border-hover: rgba(255, 255, 255, 0.15);
   
   /* Text */
-  --color-text-primary: #E6EDF3;
-  --color-text-secondary: #8B98A5;
-  --color-text-tertiary: #53606F;
+  --color-text-primary: #FFFFFF;
+  --color-text-secondary: #A1A1AA;
+  --color-text-tertiary: #71717A;
 
   /* Fonts */
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
-  
-  /* Spacing overrides if needed */
-  --spacing-xs: 4px;
-  --spacing-sm: 8px;
-  --spacing-md: 12px;
-  --spacing-lg: 16px;
-  --spacing-xl: 24px;
 }
 
 :root {
@@ -46,16 +39,33 @@ body {
 
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--color-background);
+  background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--color-border);
+  background: var(--color-border-hover);
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-border-hover);
+  background: var(--color-text-tertiary);
+}
+
+@keyframes blob {
+  0% { transform: translate(0px, 0px) scale(1); }
+  33% { transform: translate(30px, -50px) scale(1.1); }
+  66% { transform: translate(-20px, 20px) scale(0.9); }
+  100% { transform: translate(0px, 0px) scale(1); }
+}
+
+.animate-blob {
+  animation: blob 7s infinite;
+}
+.animation-delay-2000 {
+  animation-delay: 2s;
+}
+.animation-delay-4000 {
+  animation-delay: 4s;
 }

@@ -130,11 +130,24 @@ def cluster_themes(reviews: List[Dict[str, Any]]) -> Dict[str, Any]:
     # 3. Parse output safely
     try:
         # Extract JSON if the model added markdown fences
-        json_match = re.search(r"```(?:json)?(.*?)```", content, re.DOTALL)
+        json_match = re.search(r"```(?:json)?\s*(.*?)\s*```", content, re.DOTALL)
         if json_match:
-            content = json_match.group(1).strip()
-            
-        parsed_data = json.loads(content)
+            json_str = json_match.group(1).strip()
+        else:
+            # Maybe it just output raw JSON without markdown fences, try to extract first [ or {
+            start_idx = content.find('{')
+            if start_idx == -1:
+                start_idx = content.find('[')
+            end_idx = content.rfind('}')
+            if end_idx == -1 or content.rfind(']') > end_idx:
+                end_idx = content.rfind(']')
+                
+            if start_idx != -1 and end_idx != -1:
+                json_str = content[start_idx:end_idx+1]
+            else:
+                json_str = content
+                
+        parsed_data = json.loads(json_str)
         raw_result = ClusterResultRaw.model_validate(parsed_data)
     except Exception as e:
         # Fallback if parsing completely fails

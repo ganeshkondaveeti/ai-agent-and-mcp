@@ -3,6 +3,8 @@
 import React, { useEffect, useState } from "react";
 import { format } from "date-fns";
 import ReactMarkdown from "react-markdown";
+import { motion, AnimatePresence } from "framer-motion";
+import { Sparkles, MessageSquare, BarChart2, Zap, LayoutList, MessageCircle, Quote } from "lucide-react";
 
 // Types
 interface Review {
@@ -69,13 +71,12 @@ export default function Dashboard() {
     try {
       const res = await fetch(`${API_URL}/pulse/trigger`, { method: "POST" });
       if (res.ok) {
-        // Poll for updates every 4 seconds for 6 minutes total (90 attempts)
         let attempts = 0;
         const maxAttempts = 90;
         
         const pollInterval = setInterval(async () => {
           attempts++;
-          await fetchData(false); // fetch without triggering the main loading spinner
+          await fetchData(false); 
           
           if (attempts >= maxAttempts) {
             clearInterval(pollInterval);
@@ -93,171 +94,251 @@ export default function Dashboard() {
     }
   };
 
+  const avgSentiment = reviews.length 
+    ? (reviews.reduce((acc, r) => acc + (r.score || 0), 0) / reviews.length).toFixed(1)
+    : "0.0";
+
   return (
-    <div className="min-h-screen bg-background text-text-primary">
+    <div className="min-h-screen bg-background text-text-primary overflow-hidden relative">
+      {/* Animated Background Blobs */}
+      <div className="fixed inset-0 w-full h-full pointer-events-none z-0 overflow-hidden">
+        <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-primary/20 rounded-full mix-blend-screen filter blur-[100px] animate-blob" />
+        <div className="absolute top-[20%] right-[-10%] w-96 h-96 bg-ai/20 rounded-full mix-blend-screen filter blur-[100px] animate-blob animation-delay-2000" />
+        <div className="absolute bottom-[-20%] left-[20%] w-96 h-96 bg-primary/10 rounded-full mix-blend-screen filter blur-[100px] animate-blob animation-delay-4000" />
+      </div>
+
       {/* Header */}
-      <header className="fixed top-0 w-full z-50 bg-surface/90 backdrop-blur-xl border-b border-border">
+      <header className="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-xl border-b border-border/50">
         <div className="max-w-[1440px] mx-auto px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center font-bold text-primary">
-              G
+          <motion.div 
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="flex items-center gap-4"
+          >
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-ai flex items-center justify-center shadow-lg shadow-primary/20">
+              <Sparkles className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h1 className="text-lg font-semibold tracking-tight leading-none text-text-primary">Groww Pulse</h1>
-              <p className="text-xs text-text-secondary mt-1">AI-Powered Review Intelligence</p>
+              <h1 className="text-lg font-bold tracking-tight text-white">Groww Pulse</h1>
+              <p className="text-xs text-text-secondary font-medium tracking-wide uppercase">AI Review Intelligence</p>
             </div>
-          </div>
+          </motion.div>
           
-          <nav className="flex items-center space-x-4">
-            <div className="flex space-x-2">
-              {["pulse", "themes", "reviews"].map((tab) => (
-                <button
-                  key={tab}
-                  onClick={() => setActiveTab(tab)}
-                  className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
-                    activeTab === tab
-                      ? "bg-primary text-background"
-                      : "text-text-secondary hover:text-text-primary hover:bg-surface-floating"
-                  }`}
-                >
-                  {tab.charAt(0).toUpperCase() + tab.slice(1)}
-                </button>
-              ))}
+          <nav className="flex items-center space-x-6">
+            <div className="flex p-1 bg-surface-floating rounded-xl border border-border/50">
+              {[
+                { id: "pulse", icon: Zap, label: "Pulse" },
+                { id: "themes", icon: LayoutList, label: "Themes" },
+                { id: "reviews", icon: MessageCircle, label: "Reviews" }
+              ].map((tab) => {
+                const Icon = tab.icon;
+                const isActive = activeTab === tab.id;
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`relative px-4 py-1.5 rounded-lg text-sm font-medium transition-all duration-300 flex items-center gap-2 ${
+                      isActive ? "text-white" : "text-text-secondary hover:text-white"
+                    }`}
+                  >
+                    {isActive && (
+                      <motion.div
+                        layoutId="active-tab"
+                        className="absolute inset-0 bg-border/50 rounded-lg shadow-sm"
+                        transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                      />
+                    )}
+                    <Icon className="w-4 h-4 relative z-10" />
+                    <span className="relative z-10">{tab.label}</span>
+                  </button>
+                );
+              })}
             </div>
-            <div className="w-px h-6 bg-border"></div>
+            
             <button 
               onClick={triggerPipeline} 
               disabled={triggering}
-              className="px-4 py-1.5 bg-ai/10 text-ai border border-ai/20 hover:bg-ai/20 disabled:opacity-50 rounded-lg text-sm font-semibold transition-all flex items-center gap-2"
+              className="relative group px-5 py-2 rounded-xl text-sm font-bold transition-all overflow-hidden"
             >
-              {triggering ? (
-                <>
-                  <div className="w-3 h-3 border-2 border-ai border-t-transparent rounded-full animate-spin"></div>
-                  Triggering...
-                </>
-              ) : (
-                <>
-                  ⚡ Trigger Now
-                </>
-              )}
+              <div className="absolute inset-0 bg-gradient-to-r from-ai to-primary opacity-20 group-hover:opacity-30 transition-opacity" />
+              <div className="absolute inset-0 border border-white/10 group-hover:border-white/20 rounded-xl transition-colors" />
+              <div className="relative flex items-center gap-2 text-white">
+                {triggering ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white/50 border-t-white rounded-full animate-spin" />
+                    Generating Magic...
+                  </>
+                ) : (
+                  <>
+                    <Zap className="w-4 h-4 text-primary" />
+                    Trigger Now
+                  </>
+                )}
+              </div>
             </button>
           </nav>
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="pt-24 pb-12 max-w-[1440px] mx-auto px-6">
+      <main className="pt-28 pb-12 max-w-[1440px] mx-auto px-6 relative z-10">
         {loading ? (
-          <div className="flex items-center justify-center h-64">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-          </div>
-        ) : error ? (
-          <div className="p-4 bg-danger/10 border border-danger/20 rounded-lg text-danger">
-            {error}
-          </div>
-        ) : (
-          <div className="space-y-6">
-            {/* KPI Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="bg-surface border border-border rounded-xl p-4">
-                <h3 className="text-sm text-text-secondary mb-1">Total Reviews Analysed</h3>
-                <p className="text-2xl font-bold">{reviews.length}</p>
-              </div>
-              <div className="bg-surface border border-border rounded-xl p-4">
-                <h3 className="text-sm text-text-secondary mb-1">Average Sentiment</h3>
-                <p className="text-2xl font-bold">
-                  {(reviews.reduce((acc, r) => acc + (r.score || 0), 0) / (reviews.length || 1)).toFixed(1)} / 5.0
-                </p>
-              </div>
-              <div className="bg-surface border border-border rounded-xl p-4">
-                <h3 className="text-sm text-text-secondary mb-1">Identified Themes</h3>
-                <p className="text-2xl font-bold text-ai">{themes.length}</p>
+          <div className="flex flex-col items-center justify-center h-[60vh] gap-4">
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary to-ai p-[2px] animate-pulse">
+              <div className="w-full h-full bg-background rounded-[14px] flex items-center justify-center">
+                <Sparkles className="w-5 h-5 text-primary" />
               </div>
             </div>
-
-            {/* Tabs Content */}
-            {activeTab === "pulse" && (
-              <div className="bg-surface border border-border rounded-xl p-8 prose prose-invert max-w-none">
-                {pulse ? (
-                  <ReactMarkdown>{pulse.content}</ReactMarkdown>
-                ) : (
-                  <p className="text-text-secondary">No pulse report available yet.</p>
-                )}
-              </div>
-            )}
-
-            {activeTab === "themes" && (
-              <div className="grid grid-cols-1 gap-4">
-                {themes.map((theme, i) => (
-                  <div key={i} className="bg-surface border border-border hover:border-border-hover rounded-xl p-6 transition-all">
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <h3 className="text-lg font-semibold text-text-primary">{theme.name}</h3>
-                        <p className="text-sm text-text-secondary mt-1">{theme.description}</p>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="px-2.5 py-1 rounded-full bg-ai/10 text-ai text-xs font-semibold border border-ai/20">
-                          {theme.review_count} reviews
-                        </span>
-                        <span className={`px-2.5 py-1 rounded-full text-xs font-semibold border ${
-                          theme.avg_rating >= 4 ? 'bg-primary/10 text-primary border-primary/20' : 
-                          theme.avg_rating <= 2 ? 'bg-danger/10 text-danger border-danger/20' : 
-                          'bg-warning/10 text-warning border-warning/20'
-                        }`}>
-                          ★ {theme.avg_rating}
-                        </span>
-                      </div>
+            <p className="text-text-secondary font-medium tracking-wide">Loading Intelligence...</p>
+          </div>
+        ) : error ? (
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="p-6 bg-danger/10 border border-danger/20 rounded-2xl text-danger backdrop-blur-md">
+            {error}
+          </motion.div>
+        ) : (
+          <div className="space-y-8">
+            {/* KPI Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {[
+                { label: "Reviews Analysed", value: reviews.length, icon: MessageSquare, color: "text-blue-400" },
+                { label: "Avg Sentiment", value: `${avgSentiment} / 5.0`, icon: BarChart2, color: "text-primary" },
+                { label: "Identified Themes", value: themes.length, icon: Sparkles, color: "text-ai" }
+              ].map((kpi, i) => (
+                <motion.div
+                  key={kpi.label}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.1 }}
+                  className="bg-surface/50 backdrop-blur-xl border border-border/50 rounded-2xl p-6 relative overflow-hidden group hover:border-border transition-colors"
+                >
+                  <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-white/5 to-transparent rounded-bl-full opacity-0 group-hover:opacity-100 transition-opacity`} />
+                  <div className="flex items-start justify-between relative z-10">
+                    <div>
+                      <h3 className="text-sm text-text-secondary font-medium tracking-wide mb-2">{kpi.label}</h3>
+                      <p className="text-3xl font-bold text-white tracking-tight">{kpi.value}</p>
                     </div>
-                    {theme.top_quote && (
-                      <div className="mt-4 p-4 bg-surface-floating rounded-lg border border-border/50">
-                        <p className="text-sm italic text-text-secondary">"{theme.top_quote}"</p>
+                    <div className={`p-3 rounded-xl bg-surface-floating border border-border/50 ${kpi.color}`}>
+                      <kpi.icon className="w-5 h-5" />
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+
+            {/* Tab Content */}
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activeTab}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.2 }}
+              >
+                {activeTab === "pulse" && (
+                  <div className="bg-surface/60 backdrop-blur-xl border border-border/50 rounded-3xl p-10 shadow-2xl">
+                    {pulse ? (
+                      <div className="prose prose-invert prose-lg max-w-none prose-headings:text-white prose-a:text-primary prose-strong:text-white prose-strong:font-semibold">
+                        <ReactMarkdown>{pulse.content}</ReactMarkdown>
+                      </div>
+                    ) : (
+                      <div className="flex flex-col items-center justify-center py-20 text-center">
+                        <div className="w-16 h-16 rounded-2xl bg-surface-floating border border-border flex items-center justify-center mb-6">
+                          <Zap className="w-8 h-8 text-text-tertiary" />
+                        </div>
+                        <h2 className="text-xl font-bold text-white mb-2">No Pulse Generated</h2>
+                        <p className="text-text-secondary max-w-md">The AI hasn't generated a pulse report for this week yet. Click the Trigger button above to analyze recent reviews.</p>
                       </div>
                     )}
                   </div>
-                ))}
-              </div>
-            )}
+                )}
 
-            {activeTab === "reviews" && (
-              <div className="bg-surface border border-border rounded-xl overflow-hidden">
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left text-sm">
-                    <thead className="bg-surface-floating border-b border-border">
-                      <tr>
-                        <th className="px-6 py-3 font-semibold text-text-secondary">Date</th>
-                        <th className="px-6 py-3 font-semibold text-text-secondary">Rating</th>
-                        <th className="px-6 py-3 font-semibold text-text-secondary">Content</th>
-                        <th className="px-6 py-3 font-semibold text-text-secondary">Helpful</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-border">
-                      {reviews.slice(0, 50).map((review, i) => (
-                        <tr key={i} className="hover:bg-surface-floating/50 transition-colors">
-                          <td className="px-6 py-4 whitespace-nowrap text-text-tertiary">
-                            {review.at ? format(new Date(review.at), 'MMM d, yyyy') : 'Unknown'}
-                          </td>
-                          <td className="px-6 py-4">
-                            <span className={`px-2 py-1 rounded text-xs font-semibold ${
-                              review.score >= 4 ? 'bg-primary/10 text-primary' : 
-                              review.score <= 2 ? 'bg-danger/10 text-danger' : 
-                              'bg-warning/10 text-warning'
-                            }`}>
-                              ★ {review.score}
+                {activeTab === "themes" && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {themes.map((theme, i) => (
+                      <motion.div 
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: i * 0.05 }}
+                        key={i} 
+                        className="bg-surface/50 backdrop-blur-xl border border-border/50 hover:border-white/20 rounded-3xl p-8 transition-all duration-300 relative overflow-hidden group"
+                      >
+                        {/* Subtle glowing top border for top 3 themes */}
+                        {i < 3 && (
+                          <div className={`absolute top-0 left-0 w-full h-1 bg-gradient-to-r ${
+                            i === 0 ? 'from-primary to-ai' : i === 1 ? 'from-ai to-blue-500' : 'from-blue-500 to-primary'
+                          } opacity-70`} />
+                        )}
+                        
+                        <div className="flex items-start justify-between mb-4">
+                          <h3 className="text-xl font-bold text-white group-hover:text-primary transition-colors">{theme.name}</h3>
+                          <div className="flex gap-2">
+                            <span className="px-3 py-1 rounded-full bg-surface-floating border border-border/50 text-text-secondary text-xs font-bold tracking-wide">
+                              {theme.review_count} REVIEWS
                             </span>
-                          </td>
-                          <td className="px-6 py-4 max-w-md truncate text-text-secondary" title={review.content}>
-                            {review.content}
-                          </td>
-                          <td className="px-6 py-4 text-text-tertiary">
-                            👍 {review.thumbsUpCount || 0}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            )}
+                            <span className={`px-3 py-1 rounded-full text-xs font-bold border ${
+                              theme.avg_rating >= 4 ? 'bg-primary/10 text-primary border-primary/20' : 
+                              theme.avg_rating <= 2 ? 'bg-danger/10 text-danger border-danger/20' : 
+                              'bg-warning/10 text-warning border-warning/20'
+                            }`}>
+                              ★ {theme.avg_rating}
+                            </span>
+                          </div>
+                        </div>
+                        <p className="text-sm text-text-secondary leading-relaxed mb-6">{theme.description}</p>
+                        
+                        {theme.top_quote && (
+                          <div className="p-5 bg-surface-floating/80 rounded-2xl border border-border/30 relative mt-auto">
+                            <Quote className="w-5 h-5 text-primary/40 absolute top-4 right-4" />
+                            <p className="text-sm italic text-text-primary/90 pr-6">"{theme.top_quote}"</p>
+                          </div>
+                        )}
+                      </motion.div>
+                    ))}
+                  </div>
+                )}
+
+                {activeTab === "reviews" && (
+                  <div className="bg-surface/50 backdrop-blur-xl border border-border/50 rounded-3xl overflow-hidden shadow-2xl">
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-left text-sm">
+                        <thead className="bg-surface-floating/50 border-b border-border/50 backdrop-blur-md">
+                          <tr>
+                            <th className="px-8 py-5 font-semibold text-text-secondary tracking-wide uppercase text-xs">Date</th>
+                            <th className="px-8 py-5 font-semibold text-text-secondary tracking-wide uppercase text-xs">Rating</th>
+                            <th className="px-8 py-5 font-semibold text-text-secondary tracking-wide uppercase text-xs">Content</th>
+                            <th className="px-8 py-5 font-semibold text-text-secondary tracking-wide uppercase text-xs">Helpful</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-border/30">
+                          {reviews.slice(0, 50).map((review, i) => (
+                            <tr key={i} className="hover:bg-surface-floating/30 transition-colors">
+                              <td className="px-8 py-5 whitespace-nowrap text-text-tertiary font-medium">
+                                {review.at ? format(new Date(review.at), 'MMM d, yyyy') : 'Unknown'}
+                              </td>
+                              <td className="px-8 py-5">
+                                <span className={`inline-flex items-center justify-center px-2.5 py-1 rounded-md text-xs font-bold ${
+                                  review.score >= 4 ? 'bg-primary/10 text-primary' : 
+                                  review.score <= 2 ? 'bg-danger/10 text-danger' : 
+                                  'bg-warning/10 text-warning'
+                                }`}>
+                                  ★ {review.score}
+                                </span>
+                              </td>
+                              <td className="px-8 py-5 text-text-secondary max-w-xl truncate hover:whitespace-normal hover:bg-surface-floating/50 hover:rounded-lg p-2 transition-all cursor-default">
+                                {review.content}
+                              </td>
+                              <td className="px-8 py-5 text-text-tertiary font-medium">
+                                {review.thumbsUpCount || 0}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                )}
+              </motion.div>
+            </AnimatePresence>
           </div>
         )}
       </main>

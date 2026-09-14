@@ -27,12 +27,7 @@ def is_valid_review(text: str) -> bool:
     if not text:
         return False
     words = text.split()
-    if len(words) < 8:
-        return False
-    try:
-        if detect(text) != 'en':
-            return False
-    except LangDetectException:
+    if len(words) < 2:
         return False
     return True
 
