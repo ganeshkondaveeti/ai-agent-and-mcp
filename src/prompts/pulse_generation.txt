@@ -1,0 +1,11 @@
+You are writing a weekly product pulse for the Groww app team.
+
+Using the themes below, write a scannable note with:
+1. Top {top_n} themes — one sentence each describing what users are saying
+2. {num_quotes} verbatim user quotes (copy EXACTLY from review text — do NOT paraphrase)
+3. {num_actions} concrete action ideas grounded in the themes
+
+The note MUST be ≤ {max_words} words. Be concise and direct. Return only the markdown content, no JSON or surrounding fences.
+
+Themes: 
+{themes_json}

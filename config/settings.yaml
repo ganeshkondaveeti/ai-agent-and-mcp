@@ -1,0 +1,29 @@
+app:
+  play_store_id: "com.nextbillion.groww"
+  review_window_weeks: 12
+  max_reviews: 500
+
+clustering:
+  max_themes: 5
+  top_themes_in_pulse: 3
+
+pulse:
+  max_words: 250
+  num_quotes: 3
+  num_action_ideas: 3
+
+email:
+  recipient: "self"
+  subject_template: "Groww Weekly Pulse — Week {week}"
+
+gemini:
+  model: "gemini-3.6-flash"
+  temperature: 0.3
+
+groq:
+  model: "openai/gpt-oss-120b"
+  temperature: 0.3
+  rpm_limit: 30
+  rpd_limit: 1000
+  tpm_limit: 8000
+  tpd_limit: 200000

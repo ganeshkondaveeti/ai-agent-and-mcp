@@ -1,0 +1,9 @@
+Cluster these Groww app reviews into AT MOST {max_themes} themes.
+Each theme: short specific name, one-sentence description, list of review_ids.
+Assign every review to exactly one theme. No generic "Other" theme.
+Positive reviews get meaningful themes too, not just "General Praise".
+Return ONLY valid JSON:
+{{"themes":[{{"name":"...","description":"...","review_ids":["..."]}}]}}
+
+Reviews:
+{reviews_json}
