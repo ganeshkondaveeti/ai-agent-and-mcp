@@ -13,7 +13,7 @@ def create_pipeline_agent(mcp_tools: list):
     Creates a LangGraph ReAct agent that wires all tools together.
     """
     config = load_config()
-    model_name = config.get("gemini", {}).get("model", "gemini-2.5-flash")
+    model_name = config.get("gemini", {}).get("model", "gemini-flash-latest")
     temperature = config.get("gemini", {}).get("temperature", 0.3)
     
     # Initialize the Gemini LLM for orchestration
