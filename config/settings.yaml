@@ -1,7 +1,7 @@
 app:
   play_store_id: "com.nextbillion.groww"
-  review_window_weeks: 12
-  max_reviews: 500
+  review_window_weeks: 4
+  max_reviews: 150
 
 clustering:
   max_themes: 5
