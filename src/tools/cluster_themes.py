@@ -215,4 +215,11 @@ def cluster_themes(reviews: List[Dict[str, Any]]) -> Dict[str, Any]:
             top_quote=top_quote
         ))
         
-    return ClusterResult(themes=final_themes).model_dump()
+    result_dict = ClusterResult(themes=final_themes).model_dump()
+    
+    # Save themes to disk so the FastAPI backend can serve them
+    os.makedirs("data", exist_ok=True)
+    with open("data/themes.json", "w") as f:
+        json.dump(result_dict, f, indent=2)
+        
+    return result_dict

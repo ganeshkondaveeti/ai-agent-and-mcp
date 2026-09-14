@@ -618,6 +618,47 @@ These are **expected** themes — the LLM may discover different or more nuanced
   - Verify PII is fully scrubbed
   - Verify word count ≤ 250
 
+---
+
+## Phase 9: Backend Deployment (Railway)
+*Goal: Expose the AI pipeline data via a FastAPI REST API and deploy to Railway.*
+
+### Tasks
+- [ ] **9.1** Create `src/api.py` (FastAPI)
+  - Initialize FastAPI app with CORS middleware
+  - Implement `/api/health` check endpoint
+- [ ] **9.2** Data Exposure Endpoints
+  - `GET /api/pulse/latest` — Read and serve the latest pulse markdown
+  - `GET /api/reviews` — Read and serve `data/reviews.json`
+  - `GET /api/themes` — Read and serve `data/themes.json`
+- [ ] **9.3** Docker & Deployment Config
+  - Create `Dockerfile` and `Procfile`
+  - Ensure background scheduler starts on boot alongside the API
+  - Add `fastapi` and `uvicorn` to `requirements.txt`
+- [ ] **9.4** Railway Deployment
+  - Connect GitHub repo to a new Railway project
+  - Add environment variables (Gemini, Groq, MCP)
+  - Verify endpoints are live and healthy
+
+---
+
+## Phase 10: Frontend Dashboard (Vercel)
+*Goal: Convert the static HTML dashboard into a Next.js app, wire it to the Railway API, and deploy to Vercel.*
+
+### Tasks
+- [ ] **10.1** Scaffold Next.js App
+  - Initialize `dashboard/` with Next.js, Tailwind, and React
+  - Configure `tailwind.config.ts` using tokens from `DESIGN.md`
+- [ ] **10.2** Component Extraction
+  - Break down `code.html` into React components (Header, KpiCard, SentimentChart, etc.)
+  - Implement routing for the 6 navigation tabs
+- [ ] **10.3** API Integration
+  - Write fetch hooks to pull data from the Railway Backend
+  - Replace hardcoded static values with live data
+- [ ] **10.4** Vercel Deployment
+  - Connect `dashboard/` to a Vercel project
+  - Configure build settings and environment variables
+  - Deploy and test end-to-end integration
 ### Exit Criteria
 
 | Check | Expected Result |
