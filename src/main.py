@@ -71,14 +71,14 @@ async def run_agent_pipeline(mcp_tools, fallback=False):
                     
     logger.info("✅ Pipeline complete!")
     
-    if fallback and last_tool_output:
-        # Save locally
+    if last_tool_output:
+        # Save locally so the dashboard API can serve it
         now = datetime.datetime.now()
         week_num = now.isocalendar()[1]
         filename = f"output/pulse_{now.year}-W{week_num}.md"
         with open(filename, "w") as f:
             f.write(last_tool_output)
-        logger.info(f"💾 Fallback mode: Saved pulse locally to {filename}")
+        logger.info(f"💾 Saved pulse locally to {filename}")
 
 if __name__ == "__main__":
     # Suppress langchain deprecation warnings for cleaner output
