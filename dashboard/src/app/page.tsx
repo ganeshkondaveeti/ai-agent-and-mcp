@@ -37,49 +37,61 @@ export default function Dashboard() {
 
   const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
 
+  const fetchData = async (showLoading = true) => {
+    if (showLoading) setLoading(true);
+    try {
+      const [reviewsRes, themesRes, pulseRes] = await Promise.all([
+        fetch(`${API_URL}/reviews`),
+        fetch(`${API_URL}/themes`),
+        fetch(`${API_URL}/pulse/latest`),
+      ]);
+
+      if (reviewsRes.ok) setReviews(await reviewsRes.json());
+      if (themesRes.ok) {
+        const themesData = await themesRes.json();
+        setThemes(themesData.themes || []);
+      }
+      if (pulseRes.ok) setPulse(await pulseRes.json());
+    } catch (err) {
+      console.error("Failed to fetch data:", err);
+      if (showLoading) setError("Failed to connect to the backend API.");
+    } finally {
+      if (showLoading) setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, [API_URL]);
+
   const triggerPipeline = async () => {
     setTriggering(true);
     try {
       const res = await fetch(`${API_URL}/pulse/trigger`, { method: "POST" });
       if (res.ok) {
-        alert("Pipeline triggered! Check back in a few minutes for the updated pulse.");
+        // Poll for updates every 4 seconds for 60 seconds total (15 attempts)
+        let attempts = 0;
+        const maxAttempts = 15;
+        
+        const pollInterval = setInterval(async () => {
+          attempts++;
+          await fetchData(false); // fetch without triggering the main loading spinner
+          
+          if (attempts >= maxAttempts) {
+            clearInterval(pollInterval);
+            setTriggering(false);
+          }
+        }, 4000);
       } else {
         alert("Failed to trigger pipeline.");
+        setTriggering(false);
       }
     } catch (err) {
       console.error(err);
       alert("Error triggering pipeline.");
-    } finally {
       setTriggering(false);
     }
   };
-
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const [reviewsRes, themesRes, pulseRes] = await Promise.all([
-          fetch(`${API_URL}/reviews`),
-          fetch(`${API_URL}/themes`),
-          fetch(`${API_URL}/pulse/latest`),
-        ]);
-
-        if (reviewsRes.ok) setReviews(await reviewsRes.json());
-        if (themesRes.ok) {
-          const themesData = await themesRes.json();
-          setThemes(themesData.themes || []);
-        }
-        if (pulseRes.ok) setPulse(await pulseRes.json());
-      } catch (err) {
-        console.error("Failed to fetch data:", err);
-        setError("Failed to connect to the backend API.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [API_URL]);
 
   return (
     <div className="min-h-screen bg-background text-text-primary">
