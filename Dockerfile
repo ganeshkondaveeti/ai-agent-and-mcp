@@ -13,4 +13,4 @@ EXPOSE 8000
 
 # We use the Procfile for Railway to start the correct process (web or worker)
 # Default CMD in case of local docker run
-CMD ["uvicorn", "src.api:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["python", "src/api.py"]

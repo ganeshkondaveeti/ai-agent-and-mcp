@@ -73,3 +73,8 @@ async def trigger_pulse(background_tasks: BackgroundTasks):
     """
     background_tasks.add_task(run_pipeline)
     return {"status": "accepted", "message": "Pipeline triggered successfully in the background."}
+
+if __name__ == "__main__":
+    import uvicorn
+    port = int(os.environ.get("PORT", 8000))
+    uvicorn.run(app, host="0.0.0.0", port=port)
