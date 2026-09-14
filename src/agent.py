@@ -1,5 +1,5 @@
 from langgraph.prebuilt import create_react_agent
-from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_groq import ChatGroq
 from langchain_core.messages import SystemMessage
 
 from src.config import load_config
@@ -13,11 +13,11 @@ def create_pipeline_agent(mcp_tools: list):
     Creates a LangGraph ReAct agent that wires all tools together.
     """
     config = load_config()
-    model_name = config.get("gemini", {}).get("model", "gemini-flash-latest")
-    temperature = config.get("gemini", {}).get("temperature", 0.3)
+    model_name = config.get("groq", {}).get("model", "llama-3.1-70b-versatile")
+    temperature = config.get("groq", {}).get("temperature", 0.3)
     
-    # Initialize the Gemini LLM for orchestration
-    llm = ChatGoogleGenerativeAI(
+    # Initialize the Groq LLM for orchestration
+    llm = ChatGroq(
         model=model_name,
         temperature=temperature
     )
