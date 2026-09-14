@@ -69,9 +69,9 @@ export default function Dashboard() {
     try {
       const res = await fetch(`${API_URL}/pulse/trigger`, { method: "POST" });
       if (res.ok) {
-        // Poll for updates every 4 seconds for 60 seconds total (15 attempts)
+        // Poll for updates every 4 seconds for 6 minutes total (90 attempts)
         let attempts = 0;
-        const maxAttempts = 15;
+        const maxAttempts = 90;
         
         const pollInterval = setInterval(async () => {
           attempts++;
