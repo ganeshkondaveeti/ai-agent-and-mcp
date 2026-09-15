@@ -88,10 +88,10 @@ def scrub_pii(status_message: str) -> str:
         A string message indicating success.
     """
     import os
-    if not os.path.exists("data/raw_fetched.json"):
-        return "Error: data/raw_fetched.json not found."
+    if not os.path.exists("data/raw_fetched_multi.json"):
+        return "Error: data/raw_fetched_multi.json not found."
         
-    with open("data/raw_fetched.json", "r") as f:
+    with open("data/raw_fetched_multi.json", "r") as f:
         raw_reviews = json.load(f)
         
     clean_reviews = []
