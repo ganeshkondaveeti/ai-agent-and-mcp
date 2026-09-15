@@ -137,7 +137,8 @@ def cluster_themes(status_message: str) -> str:
     # Groq handles JSON mode well if we enforce it.
     llm = ChatGroq(
         model=model_name,
-        temperature=temperature
+        temperature=temperature,
+        max_retries=5
     )
     
     response = llm.invoke(prompt)

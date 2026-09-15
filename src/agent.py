@@ -21,7 +21,8 @@ def create_pipeline_agent(mcp_tools: list):
     # Initialize the Groq LLM for orchestration
     llm = ChatGroq(
         model=model_name,
-        temperature=temperature
+        temperature=temperature,
+        max_retries=5
     )
     
     # Combine our local tools with the remote MCP tools

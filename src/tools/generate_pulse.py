@@ -76,7 +76,8 @@ def generate_pulse(status_message: str) -> str:
     # Call LLM
     llm = ChatGroq(
         model=model_name,
-        temperature=temperature
+        temperature=temperature,
+        max_retries=5
     )
     
     response = llm.invoke(prompt)
