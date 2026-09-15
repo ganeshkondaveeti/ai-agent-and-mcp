@@ -112,11 +112,16 @@ def cluster_themes(status_message: str) -> str:
         
         optimized_reviews.append({
             "id": r_id,
-            "c": truncate_text(r.get("content", ""), 50)
+            "c": truncate_text(r.get("content", ""), 15)
         })
         
+    import random
+    
+    # Shuffle and pick a max of 15 reviews for the prompt to aggressively save tokens
+    sampled_reviews = random.sample(optimized_reviews, min(15, len(optimized_reviews)))
+    
     # Serialize to compact JSON
-    reviews_json = json.dumps(optimized_reviews, separators=(',', ':'))
+    reviews_json = json.dumps(sampled_reviews, separators=(',', ':'))
     
     # Load prompt
     prompt_path = os.path.join(os.path.dirname(__file__), "..", "prompts", "clustering.txt")
