@@ -235,8 +235,8 @@ export default function Dashboard() {
                     {/* KPI Cards */}
                     <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4">
                       {[
-                        { label: "Reviews Analysed", value: reviews.length, icon: MessageSquare, color: "text-blue-400" },
-                        { label: "Identified Themes", value: themes.length, icon: Sparkles, color: "text-purple-400" },
+                        { label: "Reviews Analysed", value: reviews.length, icon: MessageSquare, color: "text-blue-400", tab: "reviews" },
+                        { label: "Identified Themes", value: themes.length, icon: Sparkles, color: "text-purple-400", tab: "themes" },
                         { label: "Net Sentiment", value: `${kpis.net_sentiment.toFixed(1)}`, icon: Target, color: "text-primary" },
                         { label: "Detractor Rate", value: `${kpis.detractor_rate.toFixed(1)}%`, icon: BarChart2, color: "text-danger" },
                         { label: "Avg Sentiment", value: `${avgSentiment}`, icon: Zap, color: "text-blue-400" },
@@ -247,7 +247,8 @@ export default function Dashboard() {
                           initial={{ opacity: 0, y: 20 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ delay: i * 0.1 }}
-                          className="bg-surface/50 backdrop-blur-xl border border-border/50 rounded-2xl p-6 relative overflow-hidden group hover:border-border transition-colors"
+                          onClick={() => kpi.tab && setActiveTab(kpi.tab)}
+                          className={`bg-surface/50 backdrop-blur-xl border border-border/50 rounded-2xl p-6 relative overflow-hidden group transition-colors ${kpi.tab ? 'cursor-pointer hover:border-primary/50' : 'hover:border-border'}`}
                         >
                           <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-white/5 to-transparent rounded-bl-full opacity-0 group-hover:opacity-100 transition-opacity`} />
                           <div className="flex items-start justify-between relative z-10">

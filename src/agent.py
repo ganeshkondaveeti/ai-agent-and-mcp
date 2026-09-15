@@ -41,9 +41,9 @@ def create_pipeline_agent(mcp_tools: list):
 4. Use `aggregate_metrics` to upsert the enriched reviews into the SQLite historical database. Pass the success message from step 3 into this tool.
 5. Use `cluster_themes` on the cleaned reviews to extract themes. Pass the success message from step 4 into this tool.
 6. Use `generate_pulse` on the themes result to generate a Markdown pulse note. Pass the success message from step 5 into this tool.
-7. Use `gmail_draft` to create an email draft containing the generated Markdown pulse. The subject should be "Groww Weekly Pulse".
+7. Use `gmail_send` to send an email to "klakshmiganesh18@gmail.com" containing the generated Markdown pulse. The subject should be "Groww Weekly Pulse".
 
-Execute these steps sequentially. The tools have been optimized to read/write to the file system to save tokens. You only need to pass the status string returned by a tool into the next tool's argument. Do not skip any steps. Once you have drafted the email, inform the user that the pipeline is complete and provide the Draft details.
+Execute these steps sequentially. The tools have been optimized to read/write to the file system to save tokens. You only need to pass the status string returned by a tool into the next tool's argument. Do not skip any steps. Once you have sent the email, inform the user that the pipeline is complete and provide the Email details.
 """
 
     agent_executor = create_react_agent(llm, tools, prompt=SystemMessage(content=system_prompt))
