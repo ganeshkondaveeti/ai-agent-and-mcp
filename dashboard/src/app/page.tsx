@@ -233,14 +233,13 @@ export default function Dashboard() {
                 {activeTab === "analytics" && (
                   <div className="space-y-6">
                     {/* KPI Cards */}
-                    <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4">
+                    <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-4">
                       {[
                         { label: "Reviews Analysed", value: reviews.length, icon: MessageSquare, color: "text-blue-400", tab: "reviews" },
                         { label: "Identified Themes", value: themes.length, icon: Sparkles, color: "text-purple-400", tab: "themes" },
                         { label: "Net Sentiment", value: `${kpis.net_sentiment.toFixed(1)}`, icon: Target, color: "text-primary" },
                         { label: "Detractor Rate", value: `${kpis.detractor_rate.toFixed(1)}%`, icon: BarChart2, color: "text-danger" },
-                        { label: "Avg Sentiment", value: `${avgSentiment}`, icon: Zap, color: "text-blue-400" },
-                        { label: "Velocity (/Day)", value: kpis.velocity, icon: Activity, color: "text-ai" }
+                        { label: "Avg Sentiment", value: `${avgSentiment}`, icon: Zap, color: "text-blue-400" }
                       ].map((kpi, i) => (
                         <motion.div
                           key={kpi.label}
